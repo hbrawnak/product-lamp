@@ -1,21 +1,28 @@
-const { MongoClient } = require('mongodb');
+import {Mongoose, connect} from "mongoose";
 import config from "config";
 import logger from "./logger";
 
-async function initializeDBConnection() {
-    const dbURL = config.get<string>('dbURL');
-    const client = new MongoClient(dbURL);
+export class MongoDB {
+    dbClient: Mongoose;
 
+    constructor(mongooseClient: Mongoose) {
+        this.dbClient = mongooseClient;
+    }
+}
+
+export const newMongoDB = async (mongooseClient: Mongoose): Promise<MongoDB> => {
+    return new MongoDB(mongooseClient);
+};
+
+export const initializeDBConnection = async () => {
     try {
-        await client.connect();
+        const dbURL = config.get<string>('dbURL');
+        await newMongoDB(await connect(dbURL));
         logger.info(`Database connected`)
-    } catch (error) {
+    } catch (err) {
         logger.error(`Could not connect to database`);
         process.exit(1);
-    } finally {
-        await client.close();
     }
-
-}
+};
 
 export default initializeDBConnection;
