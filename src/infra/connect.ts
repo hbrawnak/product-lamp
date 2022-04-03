@@ -1,5 +1,6 @@
 const { MongoClient } = require('mongodb');
 import config from "config";
+import logger from "./logger";
 
 async function initializeDBConnection() {
     const dbURL = config.get<string>('dbURL');
@@ -7,9 +8,9 @@ async function initializeDBConnection() {
 
     try {
         await client.connect();
-        console.log("Database connected")
+        logger.info(`Database connected`)
     } catch (error) {
-        console.log("Could not connect to database");
+        logger.error(`Could not connect to database`);
         process.exit(1);
     } finally {
         await client.close();
