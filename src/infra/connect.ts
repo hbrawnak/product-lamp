@@ -1,7 +1,7 @@
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient } = require('mongodb');
 import config from "config";
 
-async function connect() {
+async function initializeDBConnection() {
     const dbURL = config.get<string>('dbURL');
     const client = new MongoClient(dbURL);
 
@@ -17,4 +17,4 @@ async function connect() {
 
 }
 
-export default connect;
+export default initializeDBConnection;
