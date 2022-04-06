@@ -10,8 +10,12 @@ const validate = (schema: AnyZodObject) => (req: Request, res: Response, next: N
         });
         next();
     } catch (e: any) {
-        return res.status(400).send(e.errors);
+        return sendResponse(400, true, "ERROR", e.errors, res);
     }
+}
+
+const sendResponse = (statusCode: number, error: boolean, message: string, data: string, res: Response) => {
+    return res.status(statusCode).send({error, message, data});
 }
 
 export default validate;
