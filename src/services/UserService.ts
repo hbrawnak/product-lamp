@@ -1,26 +1,25 @@
 import {UserInterface} from "../contract/UserInterface";
 import {UserServiceInterface} from "../contract/UserServiceInterface";
+import {UserRepositoryInterface} from "../contract/UserRepositoryInterface";
 
 export class UserService implements UserServiceInterface {
-    constructor(private userRepository: UserServiceInterface) {
+    constructor(private userRepository: UserRepositoryInterface) {
         this.userRepository = userRepository;
     }
 
-    public async create(user: UserInterface): Promise<UserInterface | null> {
-        return this.userRepository.create(user);
-    }
+    public async create(user: UserInterface): Promise<{ message: string; user: UserInterface | null; }> {
 
-    public async getByEmail(userId: string): Promise<UserInterface | null> {
-        return null;
-    }
+        const exisingUser = await this.userRepository.getByEmail(user.email);
+        if (!exisingUser) {
+            return {message: "User has been created!", user: await this.userRepository.create(user)};
+        }
 
-    public async getByUserId(userId: string): Promise<UserInterface | null> {
-        return null;
+        return {message: "User is exist already!", user: null};
     }
 }
 
-export const newUserService = async (userRepository: UserServiceInterface) => {
-  return new UserService(userRepository)
+export const newUserService = async (userRepository: UserRepositoryInterface) => {
+    return new UserService(userRepository)
 }
 
 export default UserService;
