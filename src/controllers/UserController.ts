@@ -1,8 +1,9 @@
 import {Request, Response} from "express";
 import {Controller} from "./Controller";
 import {UserControllerInterface} from "../contract/UserControllerInterface";
-import logger from "../infra/logger";
 import {UserServiceInterface} from "../contract/UserServiceInterface";
+import {UserSerializer} from "../serializer/UserSerializer";
+import logger from "../infra/logger";
 
 
 export class UserController extends Controller implements UserControllerInterface {
@@ -14,9 +15,14 @@ export class UserController extends Controller implements UserControllerInterfac
 
     public async create(req: Request, res: Response): Promise<any> {
         try {
-            const user = await this.userService.create(req.body);
-            /*TODO: Use serializer */
-            return await this.sendResponse(201, false,"SUCCESS", user, res);
+            const {message, user} = await this.userService.create(req.body);
+            if (user !== null) {
+                const serializedUser = await UserSerializer.serializer(user);
+                return await this.sendResponse(201, false, message, serializedUser, res);
+            } else {
+                return await this.sendResponse(409, true, message, user, res);
+            }
+
         } catch (e) {
             logger.error(e);
             return await this.sendResponse(409, true, e.message, null, res);
