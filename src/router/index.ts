@@ -1,8 +1,10 @@
 import {Request, Response, Router} from "express";
 import {UserControllerInterface} from "../contract/UserControllerInterface";
 import {userRouter} from "./userRouter";
+import {SessionControllerInterface} from "../contract/SessionControllerInterface";
+import {sessionRouter} from "./sessionRouter";
 
-const routers = async (userController: UserControllerInterface): Promise<Router> => {
+const routers = async (userController: UserControllerInterface, sessionController: SessionControllerInterface): Promise<Router> => {
     const route = Router();
 
     route.get("/", (req: Request, res: Response) => res.status(200).send({
@@ -13,6 +15,7 @@ const routers = async (userController: UserControllerInterface): Promise<Router>
     }));
 
     route.use("/api", await userRouter(userController));
+    route.use("/api", await sessionRouter(sessionController));
 
     route.use("*", (req, res) => {
         res.status(404).send({

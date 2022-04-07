@@ -6,10 +6,14 @@ import bodyParser from "body-parser";
 import routers from "./router";
 import logger from "./infra/logger";
 import User from "./models/user";
+import Session from "./models/session";
 
 import {newUserRepository} from "./repository/UserRepository";
 import {newUserService} from "./services/UserService";
 import {newUserController} from "./controllers/UserController";
+import {newSessionRepository} from "./repository/SessionRepository";
+import {newSessionService} from "./services/SessionService";
+import {newSessionController} from "./controllers/SessionController";
 
 const app = express();
 app.use(bodyParser.json());
@@ -24,7 +28,11 @@ const port = config.get<number>('port');
     const userService = await newUserService(userRepo);
     const userController = await newUserController(userService);
 
-    const routes = await routers(userController);
+    const sessionRepo = await newSessionRepository(Session);
+    const sessionService = await newSessionService(sessionRepo);
+    const sessionController = await newSessionController(userService, sessionService);
+
+    const routes = await routers(userController, sessionController);
     app.use("/", routes)
 })();
 

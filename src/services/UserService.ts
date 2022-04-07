@@ -16,6 +16,21 @@ export class UserService implements UserServiceInterface {
 
         return {message: "User is exist already!", user: null};
     }
+
+    public async validatePassword(email: string, password: string): Promise<{ valid: boolean, user: UserInterface | null }> {
+        let user = await this.userRepository.getByEmail(email);
+
+        if (!user) {
+            return {valid: false, user: null};
+        }
+
+        const isValid = await user.comparePassword(password);
+        if (!isValid) {
+            return {valid: false, user: null};
+        }
+
+        return {valid: true, user: user};
+    }
 }
 
 export const newUserService = async (userRepository: UserRepositoryInterface) => {
